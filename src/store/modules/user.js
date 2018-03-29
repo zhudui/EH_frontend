@@ -1,7 +1,6 @@
 import { loginByUsername, getInfo, logout } from '@/api/auth'
 import Router from 'vue-router'
-import router from '@/router'
-import { constantRouterMap } from '@/router'
+import router, { constantRouterMap } from '@/router'
 import Cookies from 'js-cookie'
 
 const user = {
@@ -11,12 +10,15 @@ const user = {
     fullname: '',
     email: '',
     role: '',
-    classIdArr: [],
     sid: '',
     token: Cookies.get('Token')
   },
 
   mutations: {
+    SET_ID: (state, id) => {
+      state.id = id;
+    },
+
     SET_TOKEN: (state, token) => {
       state.token = token;
     },
@@ -37,10 +39,6 @@ const user = {
       state.email = email;
     },
 
-    SET_CLASS_ID_ARR: (state, classIdArr) => {
-      state.classIdArr = classIdArr;
-    },
-
     SET_SID: (state, sid) => {
       state.sid = sid;
     }
@@ -54,9 +52,14 @@ const user = {
         loginByUsername(username, password).then(response => {
           const data = response.data;
           console.log('response.data: ', response.data);
-          Cookies.set('Token', response.data.token);
+          Cookies.set('Token', data.token);
+          commit('SET_ID', data.id);
           commit('SET_TOKEN', data.token);
           commit('SET_USERNAME', username);
+          commit('SET_FULLNAME', data.fullname);
+          commit('SET_ROLE', data.role);
+          commit('SET_EMAIL', data.email);
+          commit('SET_SID', data.sid);
           resolve();
         }).catch(error => {
           reject(error);
@@ -69,11 +72,11 @@ const user = {
       return new Promise((resolve, reject) => {
         getInfo(state.token).then(response => {
           const data = response.data;
+          commit('SET_ID', data.id);
           commit('SET_USERNAME', data.username);
           commit('SET_FULLNAME', data.fullname);
           commit('SET_ROLE', data.role);
           commit('SET_EMAIL', data.email);
-          commit('SET_CLASS_ID_ARR', data.classIdArr);
           commit('SET_SID', data.sid);
           resolve(response);
         }).catch(error => {

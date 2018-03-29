@@ -1,6 +1,8 @@
 // see http://vuejs-templates.github.io/webpack for documentation.
 var path = require('path')
 
+var isMock = false; // 是否使用假数据
+
 module.exports = {
   build: {
     env: require('./prod.env'),
@@ -27,7 +29,15 @@ module.exports = {
     autoOpenBrowser: true,
     assetsSubDirectory: 'static',
     assetsPublicPath: '',
-    proxyTable: {},
+    proxyTable: {
+      '/api': {
+        target: isMock ? 'http://127.0.0.1:8080' : 'http://127.0.0.1:3000', //接口域名
+        changeOrigin: true,//是否跨域
+        pathRewrite: {
+          '^/api': '/api'//需要rewrite重写
+        }
+      }
+    },
     // CSS Sourcemaps off by default because relative paths are "buggy"
     // with this option, according to the CSS-Loader README
     // (https://github.com/webpack/css-loader#sourcemaps)

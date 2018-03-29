@@ -10,10 +10,6 @@ function hasPermission(role, to) {
   return true;
 }
 
-// function addRouters(routers) {
-//
-// }
-
 const whiteList = ['/login']; // 不重定向白名单
 
 router.beforeEach((to, from, next) => {

@@ -33,6 +33,7 @@ export const asyncRouterMap = [
       {
         path: 'dashboard',
         name: 'Dashboard',
+        meta: { roles: ['admin'] },
         component: Dashboard
       }
     ]
