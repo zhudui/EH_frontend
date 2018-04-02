@@ -10,8 +10,7 @@ const user = {
     fullname: '',
     email: '',
     role: '',
-    sid: '',
-    token: Cookies.get('Token')
+    token: Cookies.get('token')
   },
 
   mutations: {
@@ -37,30 +36,30 @@ const user = {
 
     SET_EMAIL: (state, email) => {
       state.email = email;
-    },
-
-    SET_SID: (state, sid) => {
-      state.sid = sid;
     }
-
   },
 
   actions: {
     // 用户名登录
-    LoginByUsername({ commit }, { username, password }) {
+    LoginByUsername({ commit, dispatch, rootState }, { username, password }) {
       return new Promise((resolve, reject) => {
         loginByUsername(username, password).then(response => {
-          const data = response.data;
-          console.log('response.data: ', response.data);
-          Cookies.set('Token', data.token);
-          commit('SET_ID', data.id);
-          commit('SET_TOKEN', data.token);
-          commit('SET_USERNAME', username);
-          commit('SET_FULLNAME', data.fullname);
-          commit('SET_ROLE', data.role);
-          commit('SET_EMAIL', data.email);
-          commit('SET_SID', data.sid);
-          resolve();
+          console.log('response.data', response.data);
+          if (response.data.code === 0) {
+            const user = response.data.user;
+            commit('SET_ID', user.id);
+            commit('SET_TOKEN', Cookies.get('token'));
+            commit('SET_USERNAME', username);
+            commit('SET_FULLNAME', user.fullname);
+            commit('SET_ROLE', user.role);
+            commit('SET_EMAIL', user.email);
+            dispatch('GenerateRoutes', { role: user.role }).then(() => { // 生成可访问的路由表
+              router.addRoutes(rootState.permission.addRouters); // 动态添加可访问路由表
+              resolve();
+            });
+          } else {
+            reject(response.data.msg);
+          }
         }).catch(error => {
           reject(error);
         })
@@ -71,14 +70,13 @@ const user = {
     GetInfo({ commit, state }) {
       return new Promise((resolve, reject) => {
         getInfo(state.token).then(response => {
-          const data = response.data;
-          commit('SET_ID', data.id);
-          commit('SET_USERNAME', data.username);
-          commit('SET_FULLNAME', data.fullname);
-          commit('SET_ROLE', data.role);
-          commit('SET_EMAIL', data.email);
-          commit('SET_SID', data.sid);
-          resolve(response);
+          const user = response.data.user;
+          commit('SET_ID', user.id);
+          commit('SET_USERNAME', user.username);
+          commit('SET_FULLNAME', user.fullname);
+          commit('SET_ROLE', user.role);
+          commit('SET_EMAIL', user.email);
+          resolve(response.data);
         }).catch(error => {
           reject(error);
         });
@@ -90,7 +88,6 @@ const user = {
         logout(state.token).then(() => {
           commit('SET_TOKEN', '');
           commit('SET_ROLE', '');
-          Cookies.remove('Token');
           const newRouter = new Router({ // difficulty:去除router中duplicate路由的方法
             mode: 'hash',
             linkActiveClass: 'open active',

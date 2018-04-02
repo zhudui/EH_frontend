@@ -22,17 +22,14 @@ router.beforeEach((to, from, next) => {
     } else {
       if (!store.getters.role) { // 判断当前用户是否已拉取user_info
         store.dispatch('GetInfo').then(res => {
-          console.log('userinfo', res.data);
-          const role = res.data.role;
+          console.log('userinfo', res.user);
+          const role = res.user.role;
           store.dispatch('GenerateRoutes', { role }).then(() => { // 生成可访问的路由表
-            // addRouters(store.getters.addRouters);
-            console.log('router', router);
             router.addRoutes(store.getters.addRouters); // 动态添加可访问路由表
-            console.log('Routers', store.getters.routers);
-            console.log('addRouters', store.getters.addRouters);
             next({ ...to });
           });
-        }).catch(() => {
+        }).catch((err) => {
+          console.log('errerrerrerrerr', err);
           store.dispatch('FedLogOut').then(() => {
             next({ path: '/login' });
           });

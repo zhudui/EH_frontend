@@ -31,10 +31,10 @@ module.exports = {
     assetsPublicPath: '',
     proxyTable: {
       '/api': {
-        target: isMock ? 'http://127.0.0.1:8080' : 'http://127.0.0.1:3000', //接口域名
-        changeOrigin: true,//是否跨域
+        target: isMock ? 'http://127.0.0.1:8080/api' : 'http://127.0.0.1:3000/api', // 接口域名
+        changeOrigin: true, // 是否跨域
         pathRewrite: {
-          '^/api': '/api'//需要rewrite重写
+          '^/api': '' // 需要rewrite重写
         }
       }
     },

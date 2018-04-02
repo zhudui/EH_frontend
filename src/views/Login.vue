@@ -75,6 +75,7 @@ export default {
             this.$Message.success('登录成功');
             this.$router.push({ path: '/' });
           }).catch(err => {
+            console.log('err', err);
             this.$Message.error(err);
           });
         } else {
