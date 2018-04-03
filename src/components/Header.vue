@@ -29,7 +29,7 @@ export default {
   name: 'header',
   methods: {
     Logout() {
-      this.$store.dispatch('LogOut').then(() => {
+      this.$store.dispatch('logOut').then(() => {
         this.$router.push({ path: '/login' });
       }).catch(err => {
         this.$Message.error(err);
@@ -56,6 +56,10 @@ export default {
 </script>
 
 <style scoped>
+  .app-header {
+    z-index: 50;
+  }
+
   .nav-item {
     padding-right: 15px;
   }

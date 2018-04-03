@@ -1,4 +1,5 @@
 import { constantRouterMap, asyncRouterMap } from '@/router'
+import cloneDeep from 'lodash.clonedeep'
 
 function hasPermission(role, route) {
   if (route.meta && route.meta.roles) {
@@ -31,14 +32,16 @@ const permission = {
     SET_ROUTERS: (state, routers) => {
       state.addRouters = routers;
       state.routers = constantRouterMap.concat(routers);
+      console.log('state.routers', state.routers)
     }
   },
 
   actions: {
-    GenerateRoutes({ commit }, data) {
+    generateRoutes({ commit }, data) {
       return new Promise(resolve => {
         const { role } = data;
-        let accessedRouters = filterAsyncRouter(asyncRouterMap, role);
+        const AsyncRouterMap = cloneDeep(asyncRouterMap); // 深复制原始异步路由表，不用深复制会使原始路由表发生变化，导致错误
+        let accessedRouters = filterAsyncRouter(AsyncRouterMap, role);
         commit('SET_ROUTERS', accessedRouters);
         resolve();
       });

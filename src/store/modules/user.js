@@ -1,4 +1,4 @@
-import { loginByUsername, getInfo, logout } from '@/api/auth'
+import { LoginByUsername, GetInfo, Logout } from '@/api/user'
 import Router from 'vue-router'
 import router, { constantRouterMap } from '@/router'
 import Cookies from 'js-cookie'
@@ -41,10 +41,9 @@ const user = {
 
   actions: {
     // 用户名登录
-    LoginByUsername({ commit, dispatch, rootState }, { username, password }) {
+    loginByUsername({ commit, dispatch, rootState }, { username, password }) {
       return new Promise((resolve, reject) => {
-        loginByUsername(username, password).then(response => {
-          console.log('response.data', response.data);
+        LoginByUsername(username, password).then(response => {
           if (response.data.code === 0) {
             const user = response.data.user;
             commit('SET_ID', user.id);
@@ -53,7 +52,8 @@ const user = {
             commit('SET_FULLNAME', user.fullname);
             commit('SET_ROLE', user.role);
             commit('SET_EMAIL', user.email);
-            dispatch('GenerateRoutes', { role: user.role }).then(() => { // 生成可访问的路由表
+            console.log('user.role', user.role);
+            dispatch('generateRoutes', { role: user.role }).then(() => { // 生成可访问的路由表
               router.addRoutes(rootState.permission.addRouters); // 动态添加可访问路由表
               resolve();
             });
@@ -67,9 +67,9 @@ const user = {
     },
 
     // 获取用户信息
-    GetInfo({ commit, state }) {
+    getInfo({ commit, state }) {
       return new Promise((resolve, reject) => {
-        getInfo(state.token).then(response => {
+        GetInfo(state.token).then(response => {
           const user = response.data.user;
           commit('SET_ID', user.id);
           commit('SET_USERNAME', user.username);
@@ -83,9 +83,9 @@ const user = {
       });
     },
 
-    LogOut({ commit, state }) {
+    logOut({ commit, state }) {
       return new Promise((resolve, reject) => {
-        logout(state.token).then(() => {
+        Logout(state.token).then(() => {
           commit('SET_TOKEN', '');
           commit('SET_ROLE', '');
           const newRouter = new Router({ // difficulty:去除router中duplicate路由的方法
@@ -102,7 +102,7 @@ const user = {
       });
     },
 
-    FedLogOut({ commit }) {
+    fedLogOut({ commit }) {
       return new Promise(resolve => {
         commit('SET_TOKEN', '');
         Cookies.remove('Token');

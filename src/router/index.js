@@ -5,7 +5,8 @@ import Router from 'vue-router'
 import Full from '@/containers/Full'
 
 // Views
-import Dashboard from '@/views/Dashboard'
+import adminDashboard from '@/views/admin/dashboard'
+import teacherDashboard from '@/views/teacher/dashboard'
 
 // Login
 import Login from '@/views/Login'
@@ -34,7 +35,13 @@ export const asyncRouterMap = [
         path: 'dashboard',
         name: 'Dashboard',
         meta: { roles: ['admin'] },
-        component: Dashboard
+        component: adminDashboard
+      },
+      {
+        path: 'dashboard',
+        name: 'Dashboard',
+        meta: { roles: ['teacher', 'ta'] },
+        component: teacherDashboard
       }
     ]
   }

@@ -21,16 +21,17 @@ router.beforeEach((to, from, next) => {
       next({ path: '/' });
     } else {
       if (!store.getters.role) { // 判断当前用户是否已拉取user_info
-        store.dispatch('GetInfo').then(res => {
+        store.dispatch('getInfo').then(res => {
           console.log('userinfo', res.user);
           const role = res.user.role;
-          store.dispatch('GenerateRoutes', { role }).then(() => { // 生成可访问的路由表
+          console.log('navigationRole', role);
+          store.dispatch('generateRoutes', { role }).then(() => { // 生成可访问的路由表
             router.addRoutes(store.getters.addRouters); // 动态添加可访问路由表
             next({ ...to });
           });
         }).catch((err) => {
-          console.log('errerrerrerrerr', err);
-          store.dispatch('FedLogOut').then(() => {
+          console.log('errNavigation', err);
+          store.dispatch('fedLogOut').then(() => {
             next({ path: '/login' });
           });
         });

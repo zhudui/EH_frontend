@@ -4,14 +4,11 @@ import axios from 'axios'
 import vue from 'vue'
 
 // 创建axios实例
-console.log('process.env.NODE_ENV', process.env.NODE_ENV);
 const service = axios.create({
   baseURL: process.env.NODE_ENV === 'development' ? '/api' : process.env.BASE_API,
   // baseURL: 'http://127.0.0.1:3000/api',
   timeout: 5000
 });
-
-console.log('service', service);
 
 // request拦截器
 service.interceptors.request.use(config => {

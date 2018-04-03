@@ -71,7 +71,7 @@ export default {
     handleLogin() {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
-          this.$store.dispatch('LoginByUsername', this.loginForm).then(() => {
+          this.$store.dispatch('loginByUsername', this.loginForm).then(() => {
             this.$Message.success('登录成功');
             this.$router.push({ path: '/' });
           }).catch(err => {

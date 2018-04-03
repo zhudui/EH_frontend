@@ -5,3 +5,7 @@ export function param2Obj(url) {
   }
   return JSON.parse('{"' + decodeURIComponent(search).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g, '":"') + '"}');
 }
+
+export function deepClone(obj) {
+
+}
