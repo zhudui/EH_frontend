@@ -38,3 +38,9 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+  .container-fluid {
+    padding-top: 20px;
+  }
+</style>

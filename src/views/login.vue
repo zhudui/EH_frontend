@@ -59,10 +59,10 @@ export default {
       },
       loginRules: {
         username: [
-          { require: true, trigger: 'blur', validator: validateUsername }
+          { require: true, validator: validateUsername }
         ],
         password: [
-          { require: true, trigger: 'blur', validator: validatePassword }
+          { require: true, validator: validatePassword }
         ]
       }
     };

@@ -23,17 +23,15 @@
           </RadioGroup>
         </FormItem>
         <FormItem>
-          <Button type="primary" @click="addUser">添加</Button>
+          <Button type="primary" :loading="addingUser" @click="addUser">添加</Button>
           <Button type="ghost" style="margin-left: 8px" @click="hideForm = true">取消</Button>
         </FormItem>
       </Form>
     </div>
     <Table :row-class-name="rowClassName" :columns="userColumns" :data="userList" style="margin-top: 15px"></Table>
     <Modal
-      v-model="editUserModel"
-      title="编辑用户"
-      :loading="editingUser"
-      @on-ok="editUser">
+      v-model="editUserModal"
+      title="编辑用户">
       <Form ref="editUserForm" :model="editUserForm" :rules="userRules" :label-width="80" style="margin-top: 24px">
         <FormItem label="用户名" prop="username">
           <Input v-model="editUserForm.username" disabled></Input>
@@ -50,8 +48,12 @@
           </RadioGroup>
         </FormItem>
       </Form>
+      <div slot="footer">
+        <Button @click="editUserModal = false">返回</Button>
+        <Button type="primary" :loading="editingUser" @click="editUser">确定</Button>
+      </div>
     </Modal>
-    <Modal v-model="deleteUserModel" width="360">
+    <Modal v-model="deleteUserModal" width="360">
       <p slot="header" style="color:#f60;text-align:center">
         <Icon type="information-circled"></Icon>
         <span>删除确认</span>
@@ -98,9 +100,10 @@
 
       return {
         hideForm: true,
+        addingUser: false,
         editingUser: false,
-        editUserModel: false,
-        deleteUserModel: false,
+        editUserModal: false,
+        deleteUserModal: false,
         deleteUserInfo: {
           username: ''
         },
@@ -140,7 +143,7 @@
                   },
                   on: {
                     click: () => {
-                      this.editUserModel = true;
+                      this.editUserModal = true;
                       const user = params.row;
                       console.log('user', user);
                       this.editUserForm = {
@@ -159,7 +162,7 @@
                   on: {
                     click: () => {
                       this.deleteUserInfo.username = params.row.username;
-                      this.deleteUserModel = true;
+                      this.deleteUserModal = true;
                     }
                   }
                 }, 'Delete')
@@ -181,13 +184,13 @@
         },
         userRules: {
           username: [
-            { require: true, trigger: 'blur', validator: validateUsername }
+            { require: true, validator: validateUsername }
           ],
           fullname: [
-            { require: true, trigger: 'blur', validator: validateFullname }
+            { require: true, validator: validateFullname }
           ],
           password: [
-            { require: true, trigger: 'blur', validator: validatePassword }
+            { require: true, validator: validatePassword }
           ]
         }
       }
@@ -217,11 +220,13 @@
         console.log('addUserForm', this.addUserForm);
         this.$refs.addUserForm.validate(valid => {
           if (valid) {
+            this.addingUser = true;
             AddUser(this.addUserForm).then((res) => {
               if (res.data.code === 0) {
                 GetAllUser().then(res => {
                   console.log('res.data', res.data);
                   this.userList = res.data.userList;
+                  this.addingUser = false;
                   this.$Message.success('添加用户成功');
                 }).catch(err => {
                   this.$Message.error(err);
@@ -239,20 +244,29 @@
       },
 
       editUser() {
-        EditUser({
-          username: this.editUserForm.username,
-          fullname: this.editUserForm.fullname
-        }).then(res => {
-          if (res.data.code === 0) {
-            GetAllUser().then(res => {
-              this.userList = res.data.userList;
-              this.$Message.success('修改用户成功');
+        this.$refs.editUserForm.validate(valid => {
+          if (valid) {
+            this.editingUser = true;
+            EditUser({
+              username: this.editUserForm.username,
+              fullname: this.editUserForm.fullname
+            }).then(res => {
+              if (res.data.code === 0) {
+                GetAllUser().then(res => {
+                  this.userList = res.data.userList;
+                  this.editingUser = false;
+                  this.editUserModal = false;
+                  this.$Message.success('修改用户成功');
+                }).catch(err => {
+                  this.$Message.error(err);
+                });
+              }
             }).catch(err => {
               this.$Message.error(err);
-            });
+            })
+          } else {
+            this.$Message.error('输入出错，请检查');
           }
-        }).catch(err => {
-          this.$Message.error(err);
         })
       },
 
@@ -263,7 +277,7 @@
             GetAllUser().then(res => {
               this.userList = res.data.userList;
               this.deletingUser = false;
-              this.deleteUserModel = false;
+              this.deleteUserModal = false;
               this.$Message.success('删除用户成功');
             }).catch(err => {
               this.$Message.error(err);
@@ -293,9 +307,8 @@
 
 <style scoped>
   .admin-dashboard-container {
-    margin-top: 15px;
     background-color: white;
-    padding: 15px;
+    padding: 18px;
   }
 
   .form-container {

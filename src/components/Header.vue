@@ -55,6 +55,12 @@ export default {
 }
 </script>
 
+<style>
+  .ivu-select-dropdown .ivu-dropdown-menu {
+    margin-bottom: 0px;
+  }
+</style>
+
 <style scoped>
   .app-header {
     z-index: 50;
