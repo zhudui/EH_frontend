@@ -7,3 +7,17 @@ export function AddHomework(homework) {
     data: homework
   });
 }
+
+export function GetHomeworkList(classId) {
+  return fetch({
+    url: '/homeworkList?classId=' + classId,
+    method: 'get'
+  });
+}
+
+export function GetHomeworkNameList(classId) {
+  return fetch({
+    url: '/homeworkNameList?classId=' + classId,
+    method: 'get'
+  });
+}

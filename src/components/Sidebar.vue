@@ -126,7 +126,7 @@ export default {
       return this.classList.map(data => {
         return {
           name: data.name,
-          url: '/t/classInfo/' + data.id,
+          url: '/classInfo/' + data.id,
           icon: 'icon-star'
         }
       });
@@ -155,7 +155,7 @@ export default {
           AddClass(this.addClassForm).then(res => {
             if (res.data.code === 0) {
               console.log('res.data.classData', res.data.classData);
-              this.classList.unshift(res.data.classData);
+              this.classList.push(res.data.classData);
               this.addingClass = false;
               this.addClassModal = false;
               this.$Message.success('创建class成功');

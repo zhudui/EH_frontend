@@ -10,7 +10,7 @@
   import { mapGetters } from 'vuex'
   import { GetClassList } from '@/api/class'
   export default {
-    name: 'TeacherDashboard',
+    name: 'Dashboard',
     computed: {
       ...mapGetters(['fullname', 'role'])
     },
@@ -19,7 +19,7 @@
         if (res.data.code === 0) {
           const classList = res.data.classList;
           if (classList.length) {
-            let path = this.role === 'student' ? '/classInfo/' : '/t/classInfo/';
+            let path = '/classInfo/';
             path += classList[0].id;
             this.$router.push({ path: path });
           }

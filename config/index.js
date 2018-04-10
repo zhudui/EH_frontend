@@ -36,7 +36,14 @@ module.exports = {
         pathRewrite: {
           '^/api': '' // 需要rewrite重写
         }
-      }
+      },
+      '/assets': {
+        target: isMock ? 'http://127.0.0.1:8080/assets' : 'http://127.0.0.1:3000/assets', // 接口域名
+        changeOrigin: true, // 是否跨域
+        pathRewrite: {
+          '^/assets': '' // 需要rewrite重写
+        }
+      },
     },
     // CSS Sourcemaps off by default because relative paths are "buggy"
     // with this option, according to the CSS-Loader README

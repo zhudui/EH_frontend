@@ -6,10 +6,10 @@
 
     <Dropdown class="nav-item" placement="bottom-end">
       <a href="javascript:void(0)">
-           <span slot="button">
+        <span slot="button">
           <img src="static/img/avatars/6.jpg" class="img-avatar" alt="o">
-          <span class="d-md-down-none">admin</span>
-          </span>
+          <span class="d-md-down-none">{{fullname}}</span>
+        </span>
       </a>
       <Dropdown-menu slot="list">
         <Dropdown-item>
@@ -25,34 +25,38 @@
   </header>
 </template>
 <script>
-export default {
-  name: 'header',
-  methods: {
-    Logout() {
-      this.$store.dispatch('logOut').then(() => {
-        this.$router.push({ path: '/login' });
-      }).catch(err => {
-        this.$Message.error(err);
-      });
+  import { mapGetters } from 'vuex'
+  export default {
+    name: 'header',
+    computed: {
+      ...mapGetters(['fullname'])
     },
-    sidebarToggle (e) {
-      e.preventDefault()
-      document.body.classList.toggle('sidebar-hidden')
-    },
-    sidebarMinimize (e) {
-      e.preventDefault()
-      document.body.classList.toggle('sidebar-minimized')
-    },
-    mobileSidebarToggle (e) {
-      e.preventDefault()
-      document.body.classList.toggle('sidebar-mobile-show')
-    },
-    asideToggle (e) {
-      e.preventDefault()
-      document.body.classList.toggle('aside-menu-hidden')
+    methods: {
+      Logout() {
+        this.$store.dispatch('logOut').then(() => {
+          this.$router.push({ path: '/login' });
+        }).catch(err => {
+          this.$Message.error(err);
+        });
+      },
+      sidebarToggle (e) {
+        e.preventDefault()
+        document.body.classList.toggle('sidebar-hidden')
+      },
+      sidebarMinimize (e) {
+        e.preventDefault()
+        document.body.classList.toggle('sidebar-minimized')
+      },
+      mobileSidebarToggle (e) {
+        e.preventDefault()
+        document.body.classList.toggle('sidebar-mobile-show')
+      },
+      asideToggle (e) {
+        e.preventDefault()
+        document.body.classList.toggle('aside-menu-hidden')
+      }
     }
   }
-}
 </script>
 
 <style>
@@ -70,7 +74,7 @@ export default {
     padding-right: 15px;
   }
 
-  .dropdown-itemp{
+  .dropdown-itemp {
     font-size: 15px;
     display: table-cell;
     vertical-align:middle;

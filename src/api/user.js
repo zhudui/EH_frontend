@@ -57,3 +57,38 @@ export function DeleteUser(user) {
     data: user
   })
 }
+
+export function GetClassUserList(classId, option) {
+  let url = '/classUserList?classId=' + classId;
+  if (option && option.onlyStudent) {
+    url += '&onlyStudent=true'
+  }
+  return fetch({
+    url: url,
+    method: 'get'
+  });
+}
+
+export function AddClassUser(data) {
+  return fetch({
+    url: '/addClassUser',
+    method: 'post',
+    data: data
+  })
+}
+
+export function DeleteClassUser(data) {
+  return fetch({
+    url: '/userClass',
+    method: 'delete',
+    data: data
+  })
+}
+
+export function GetUploadUserList(data) {
+  return fetch({
+    url: '/getUploadUserList',
+    method: 'post',
+    data: data
+  })
+}

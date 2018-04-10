@@ -221,7 +221,7 @@
         this.$refs.addUserForm.validate(valid => {
           if (valid) {
             this.addingUser = true;
-            AddUser(this.addUserForm).then((res) => {
+            AddUser(this.addUserForm).then(res => {
               if (res.data.code === 0) {
                 GetAllUser().then(res => {
                   console.log('res.data', res.data);
@@ -280,12 +280,12 @@
               this.deleteUserModal = false;
               this.$Message.success('删除用户成功');
             }).catch(err => {
-              this.$Message.error(err);
+              console.error(err);
             });
           }
         }).catch(err => {
-          this.$Message.error(err);
-        })
+          console.error(err);
+        });
       }
     }
   }
