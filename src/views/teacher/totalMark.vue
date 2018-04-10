@@ -1,6 +1,6 @@
 <template>
   <div class="total-mark-container">
-    <h5 style="margin-bottom: 15px;">班级成绩总评</h5>
+    <h5 style="margin-bottom: 15px;">{{className}} 班级成绩总评</h5>
     <Table border :columns="userColumns" :data="studentList"></Table>
   </div>
 </template>
@@ -9,10 +9,12 @@
   import { GetHomeworkNameList } from '@/api/homework'
   import { GetClassUserList } from '@/api/user'
   import { GetClassReviewData } from '@/api/review'
+  import { GetClassName } from '@/api/class'
   export default {
     name: 'TotalMark',
     data() {
       return {
+        className: '',
         userColumns: [{
           title: '学号',
           key: 'username'
@@ -25,6 +27,13 @@
       }
     },
     mounted() {
+      GetClassName(this.$route.params.classId).then(res => {
+        if (res.data.code === 0) {
+          this.className = res.data.classData.name;
+        }
+      }).catch(err => {
+        console.error(err);
+      });
       GetHomeworkNameList(this.$route.params.classId).then(res => {
         if (res.data.code === 0) {
           let homeworkList = res.data.homeworkNameList;

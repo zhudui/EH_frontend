@@ -1,5 +1,6 @@
 <template>
-  <div class="class-info-container">
+  <div class="class-info-container clearfix">
+    <h5 class="left" style="margin-top: 4px;">{{className}}</h5>
     <div class="operation-bar clearfix" v-if="role === 'teacher' || role === 'ta'">
       <Button class="right" type="warning" @click="jumpToTotalMark">查看班级总评</Button>
       <Button class="right" type="success" style="margin-right: 15px" @click="toggleClassUserList">管理班级用户</Button>
@@ -146,6 +147,7 @@
   import { AddHomework, GetHomeworkList } from '@/api/homework'
   import { GetFilePath } from '@/api/upload'
   import { GetReview } from '@/api/review'
+  import { GetClassName } from '@/api/class'
   import { addHomeworkState, fileDownload } from '@/utils';
 
   export default {
@@ -194,6 +196,7 @@
       };
 
       return {
+        className: '',
         addHomeworkModal: false,
         addingHomework: false,
         addHomeworkForm: {
@@ -301,6 +304,14 @@
       '$route' (to, from) {
         this.hideTable = true;
         this.hideForm = true;
+        GetClassName(this.$route.params.classId).then(res => {
+          if (res.data.code === 0) {
+            this.className = res.data.classData.name;
+          }
+        }).catch(err => {
+          console.error(err);
+        });
+        this.$store.dispatch('getClassName', { classId: this.$route.params.classId });
         GetHomeworkList(this.$route.params.classId).then(res => {
           if (res.data.code === 0) {
             this.homeworkList = res.data.homeworkList;
@@ -316,6 +327,13 @@
     },
     mounted() {
       const self = this;
+      GetClassName(this.$route.params.classId).then(res => {
+        if (res.data.code === 0) {
+          this.className = res.data.classData.name;
+        }
+      }).catch(err => {
+        console.error(err);
+      });
       GetHomeworkList(this.$route.params.classId).then(res => {
         if (res.data.code === 0) {
           this.homeworkList = res.data.homeworkList;

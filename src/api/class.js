@@ -14,3 +14,10 @@ export function GetClassList() {
     method: 'get'
   });
 }
+
+export function GetClassName(classId) {
+  return fetch({
+    url: '/className?classId=' + classId,
+    method: 'get'
+  });
+}
