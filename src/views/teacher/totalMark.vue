@@ -1,20 +1,20 @@
 <template>
   <div class="total-mark-container">
-    <h5 style="margin-bottom: 15px;">{{className}} 班级成绩总评</h5>
+    <h5 style="margin-bottom: 15px;">{{courseName}} 班级成绩总评</h5>
     <Table border :columns="userColumns" :data="studentList"></Table>
   </div>
 </template>
 
 <script>
   import { GetHomeworkNameList } from '@/api/homework'
-  import { GetClassUserList } from '@/api/user'
-  import { GetClassReviewData } from '@/api/review'
-  import { GetClassName } from '@/api/class'
+  import { GetCourseUserList } from '@/api/user'
+  import { GetCourseReviewData } from '@/api/review'
+  import { GetCourseName } from '@/api/course'
   export default {
     name: 'TotalMark',
     data() {
       return {
-        className: '',
+        courseName: '',
         userColumns: [{
           title: '学号',
           key: 'username'
@@ -27,14 +27,14 @@
       }
     },
     mounted() {
-      GetClassName(this.$route.params.classId).then(res => {
+      GetCourseName(this.$route.params.courseId).then(res => {
         if (res.data.code === 0) {
-          this.className = res.data.classData.name;
+          this.courseName = res.data.courseData.name;
         }
       }).catch(err => {
         console.error(err);
       });
-      GetHomeworkNameList(this.$route.params.classId).then(res => {
+      GetHomeworkNameList(this.$route.params.courseId).then(res => {
         if (res.data.code === 0) {
           let homeworkList = res.data.homeworkNameList;
           const homeworkCounts = homeworkList.length;
@@ -48,16 +48,16 @@
             title: '平均分',
             key: 'averageScore'
           })
-          GetClassUserList(this.$route.params.classId, { onlyStudent: true }).then(res => {
+          GetCourseUserList(this.$route.params.courseId, { onlyStudent: true }).then(res => {
             if (res.data.code === 0) {
-              let classStudentList = res.data.classUserList;
-              console.log('classUserList', classStudentList);
-              GetClassReviewData(this.$route.params.classId).then(res => {
+              let courseStudentList = res.data.courseUserList;
+              console.log('courseUserList', courseStudentList);
+              GetCourseReviewData(this.$route.params.courseId).then(res => {
                 if (res.data.code === 0) {
                   let tableData = [];
                   let reviewData = res.data.reviewData;
                   console.log('reviewData', reviewData);
-                  classStudentList.forEach(student => {
+                  courseStudentList.forEach(student => {
                     let rowData = {
                       id: student.id,
                       username: student.username,

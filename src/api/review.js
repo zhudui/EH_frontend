@@ -24,9 +24,9 @@ export function GetReview(data) {
   });
 }
 
-export function GetClassReviewData(classId) {
+export function GetCourseReviewData(courseId) {
   return fetch({
-    url: '/classReviewData?classId=' + classId,
+    url: '/courseReviewData?courseId=' + courseId,
     method: 'get'
   });
 }

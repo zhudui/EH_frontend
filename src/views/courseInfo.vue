@@ -1,38 +1,38 @@
 <template>
-  <div class="class-info-container clearfix">
-    <h5 class="left" style="margin-top: 4px;">{{className}}</h5>
+  <div class="course-info-container clearfix">
+    <h5 class="left" style="margin-top: 4px;">{{courseName}}</h5>
     <div class="operation-bar clearfix" v-if="role === 'teacher' || role === 'ta'">
       <Button class="right" type="warning" @click="jumpToTotalMark">查看班级总评</Button>
-      <Button class="right" type="success" style="margin-right: 15px" @click="toggleClassUserList">管理班级用户</Button>
+      <Button class="right" type="success" style="margin-right: 15px" @click="toggleCourseUserList">管理班级用户</Button>
       <Button class="right" type="primary" style="margin-right: 15px" @click="addHomeworkModal = true">添加作业</Button>
     </div>
     <div :class="{ 'form-container': true, 'hide-form': hideForm }" v-if="role === 'teacher' || role === 'ta'">
-      <Form ref="addClassUserForm" :model="addClassUserForm" :rules="addClassUserRules" :label-width="80" style="margin-top: 24px">
+      <Form ref="addCourseUserForm" :model="addCourseUserForm" :rules="addCourseUserRules" :label-width="80" style="margin-top: 24px">
         <FormItem label="用户名" prop="username">
-          <Input v-model="addClassUserForm.username" placeholder="请输入用户名..."></Input>
+          <Input v-model="addCourseUserForm.username" placeholder="请输入用户名..."></Input>
         </FormItem>
         <FormItem>
-          <Button type="primary" :loading="addingClassUser" @click="addClassUser">添加</Button>
+          <Button type="primary" :loading="addingCourseUser" @click="addCourseUser">添加</Button>
           <Button type="ghost" style="margin-left: 8px" @click="hideForm = true">取消</Button>
         </FormItem>
       </Form>
     </div>
-    <div :class="{ 'class-user-table-container': true, 'hide-table': hideTable, 'clearfix': true }" v-if="role === 'teacher' || role === 'ta'">
+    <div :class="{ 'course-user-table-container': true, 'hide-table': hideTable, 'clearfix': true }" v-if="role === 'teacher' || role === 'ta'">
       <div class="right">
         <Button type="success" style="margin: 13px 0;" @click="hideForm = !hideForm">添加新用户</Button>
       </div>
-      <Table :row-class-name="rowClassName" :columns="classUserColumns" :data="classUserList" style="margin-top: 60px"></Table>
+      <Table :row-class-name="rowClassName" :columns="courseUserColumns" :data="courseUserList" style="margin-top: 60px"></Table>
     </div>
-    <Modal v-model="deleteClassUserModal" width="360" v-if="role === 'teacher' || role === 'ta'">
+    <Modal v-model="deleteCourseUserModal" width="360" v-if="role === 'teacher' || role === 'ta'">
       <p slot="header" style="color:#f60;text-align:center">
         <Icon type="information-circled"></Icon>
         <span>删除确认</span>
       </p>
       <div style="text-align:center">
-        <p>你确定要删除用户 {{ deleteClassUserInfo.username }} 吗？</p>
+        <p>你确定要删除用户 {{ deleteCourseUserInfo.username }} 吗？</p>
       </div>
       <div slot="footer">
-        <Button type="error" size="large" long :loading="deletingClassUser" @click="deleteClassUser">删除</Button>
+        <Button type="error" size="large" long :loading="deletingCourseUser" @click="deleteCourseUser">删除</Button>
       </div>
     </Modal>
 
@@ -143,15 +143,15 @@
 <script>
   import moment from 'moment'
   import { mapGetters } from 'vuex'
-  import { AddClassUser, GetClassUserList, DeleteClassUser } from '@/api/user'
+  import { AddCourseUser, GetCourseUserList, DeleteCourseUser } from '@/api/user'
   import { AddHomework, GetHomeworkList } from '@/api/homework'
   import { GetFilePath } from '@/api/upload'
   import { GetReview } from '@/api/review'
-  import { GetClassName } from '@/api/class'
+  import { GetCourseName } from '@/api/course'
   import { addHomeworkState, fileDownload } from '@/utils';
 
   export default {
-    name: 'ClassInfo',
+    name: 'CourseInfo',
     data() {
       const validateUsername = (rule, value, callback) => {
         if (value.length === 0 || value.length > 20) {
@@ -196,7 +196,7 @@
       };
 
       return {
-        className: '',
+        courseName: '',
         addHomeworkModal: false,
         addingHomework: false,
         addHomeworkForm: {
@@ -223,23 +223,23 @@
         homeworkRow: 1,
         hideTable: true,
         hideForm: true,
-        classUserList: [],
-        addClassUserForm: {
+        courseUserList: [],
+        addCourseUserForm: {
           username: ''
         },
-        addClassUserRules: {
+        addCourseUserRules: {
           name: [
             { require: true, validator: validateUsername }
           ]
         },
-        addingClassUser: false,
-        deleteClassUserInfo: {
+        addingCourseUser: false,
+        deleteCourseUserInfo: {
           userId: null,
           username: ''
         },
-        deletingClassUser: false,
-        deleteClassUserModal: false,
-        classUserColumns: [
+        deletingCourseUser: false,
+        deleteCourseUserModal: false,
+        courseUserColumns: [
           {
             title: '用户名',
             key: 'username'
@@ -271,9 +271,9 @@
                   },
                   on: {
                     click: () => {
-                      this.deleteClassUserInfo.userId = params.row.id;
-                      this.deleteClassUserInfo.username = params.row.username;
-                      this.deleteClassUserModal = true;
+                      this.deleteCourseUserInfo.userId = params.row.id;
+                      this.deleteCrouseUserInfo.username = params.row.username;
+                      this.deleteCourseUserModal = true;
                     }
                   }
                 }, 'Delete')
@@ -304,15 +304,15 @@
       '$route' (to, from) {
         this.hideTable = true;
         this.hideForm = true;
-        GetClassName(this.$route.params.classId).then(res => {
+        GetCourseName(this.$route.params.courseId).then(res => {
           if (res.data.code === 0) {
-            this.className = res.data.classData.name;
+            this.courseName = res.data.courseData.name;
           }
         }).catch(err => {
           console.error(err);
         });
-        this.$store.dispatch('getClassName', { classId: this.$route.params.classId });
-        GetHomeworkList(this.$route.params.classId).then(res => {
+        this.$store.dispatch('getCourseName', { courseId: this.$route.params.courseId });
+        GetHomeworkList(this.$route.params.courseId).then(res => {
           if (res.data.code === 0) {
             this.homeworkList = res.data.homeworkList;
             addHomeworkState(this.homeworkList);
@@ -327,14 +327,14 @@
     },
     mounted() {
       const self = this;
-      GetClassName(this.$route.params.classId).then(res => {
+      GetCourseName(this.$route.params.courseId).then(res => {
         if (res.data.code === 0) {
-          this.className = res.data.classData.name;
+          this.courseName = res.data.courseData.name;
         }
       }).catch(err => {
         console.error(err);
       });
-      GetHomeworkList(this.$route.params.classId).then(res => {
+      GetHomeworkList(this.$route.params.courseId).then(res => {
         if (res.data.code === 0) {
           this.homeworkList = res.data.homeworkList;
           addHomeworkState(this.homeworkList);
@@ -367,34 +367,34 @@
         }
       },
 
-      toggleClassUserList() {
+      toggleCourseUserList() {
         this.hideTable = !this.hideTable;
         this.hideForm = true;
         if (!this.hideTable) {
-          GetClassUserList(this.$route.params.classId).then(res => {
+          GetCourseUserList(this.$route.params.courseId).then(res => {
             console.log('res.data', res.data);
-            this.classUserList = res.data.classUserList;
+            this.courseUserList = res.data.courseUserList;
           }).catch(err => {
             console.log(err);
           });
         }
       },
 
-      addClassUser() {
-        this.$refs.addClassUserForm.validate(valid => {
+      addCourseUser() {
+        this.$refs.addCourseUserForm.validate(valid => {
           if (valid) {
-            if (this.classUserList.find(user => user.username === this.addClassUserForm.username)) {
+            if (this.courseUserList.find(user => user.username === this.addCourseUserForm.username)) {
               this.$Message.warning('该用户已在此班级');
             } else {
-              this.addingClassUser = true;
-              const classUserData = {
-                classId: this.$route.params.classId,
-                username: this.addClassUserForm.username
+              this.addingCourseUser = true;
+              const courseUserData = {
+                courseId: this.$route.params.courseId,
+                username: this.addCourseUserForm.username
               };
-              AddClassUser(classUserData).then(res => {
-                this.addingClassUser = false;
+              AddCourseUser(courseUserData).then(res => {
+                this.addingCourseUser = false;
                 if (res.data.code === 0) {
-                  this.classUserList.push(res.data.classUser);
+                  this.courseUserList.push(res.data.courseUser);
                   this.$Message.success('添加用户成功');
                 } else {
                   this.$Message.error(res.data.msg);
@@ -409,18 +409,18 @@
         });
       },
 
-      deleteClassUser() {
-        this.deletingClassUser = true;
+      deleteCourseUser() {
+        this.deletingCourseUser = true;
         const data = {
-          userId: this.deleteClassUserInfo.userId,
-          classId: this.$route.params.classId
+          userId: this.deleteCourseUserInfo.userId,
+          courseId: this.$route.params.courseId
         };
-        DeleteClassUser(data).then(res => {
-          GetClassUserList(this.$route.params.classId).then(res => {
+        DeleteCourseUser(data).then(res => {
+          GetCourseUserList(this.$route.params.courseId).then(res => {
             console.log('res.data', res.data);
-            this.classUserList = res.data.classUserList;
-            this.deletingClassUser = false;
-            this.deleteClassUserModal = false;
+            this.courseUserList = res.data.courseUserList;
+            this.deletingCourseUser = false;
+            this.deleteCourseUserModal = false;
             this.$Message.success('删除用户成功');
           }).catch(err => {
             console.log(err);
@@ -435,7 +435,7 @@
             const homeworkData = {
               name: this.addHomeworkForm.name,
               description: this.addHomeworkForm.description,
-              classId: this.$route.params.classId,
+              courseId: this.$route.params.courseId,
               startTime: moment(this.addHomeworkForm.startTime).format('YYYY-MM-DD HH:mm:ss'),
               endTime: moment(this.addHomeworkForm.endTime).format('YYYY-MM-DD HH:mm:ss')
             };
@@ -514,7 +514,7 @@
       },
 
       jumpToTotalMark() {
-        this.$router.push({ path: '/totalMark/' + this.$route.params.classId });
+        this.$router.push({ path: '/totalMark/' + this.$route.params.courseId });
       }
     }
   }
@@ -544,7 +544,7 @@
     border: 1px solid #536c79;
   }
 
-  .class-info-container {
+  .course-info-container {
     background-color: white;
     padding: 18px;
   }
@@ -565,7 +565,7 @@
     color: #0a3544;
   }
 
-  .class-user-table-container {
+  .course-user-table-container {
     transition: all .5s;
     overflow: hidden;
     width: 100%;

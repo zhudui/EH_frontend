@@ -58,8 +58,8 @@ export function DeleteUser(user) {
   })
 }
 
-export function GetClassUserList(classId, option) {
-  let url = '/classUserList?classId=' + classId;
+export function GetCourseUserList(courseId, option) {
+  let url = '/courseUserList?courseId=' + courseId;
   if (option && option.onlyStudent) {
     url += '&onlyStudent=true'
   }
@@ -69,17 +69,17 @@ export function GetClassUserList(classId, option) {
   });
 }
 
-export function AddClassUser(data) {
+export function AddCourseUser(data) {
   return fetch({
-    url: '/addClassUser',
+    url: '/addCourseUser',
     method: 'post',
     data: data
   })
 }
 
-export function DeleteClassUser(data) {
+export function DeleteCourseUser(data) {
   return fetch({
-    url: '/userClass',
+    url: '/userCourse',
     method: 'delete',
     data: data
   })

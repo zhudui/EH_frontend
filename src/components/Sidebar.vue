@@ -6,12 +6,12 @@
         <li class="nav-item" v-if="role !== 'admin'">
           <li class="nav-title">
             class列表
-            <span @click="addClassModal = true" v-if="role === 'teacher'">
-              <b-badge variant="primary" class="add-class-button right">添加class</b-badge>
+            <span @click="addCourseModal = true" v-if="role === 'teacher'">
+              <b-badge variant="primary" class="add-course-button right">添加课程</b-badge>
             </span>
           </li>
         </li>
-        <li class="nav-item" v-for="(item, index) in classListNav">
+        <li class="nav-item" v-for="(item, index) in courseListNav">
           <template v-if="item.title">
             <SidebarNavTitle :name="item.name"/>
           </template>
@@ -47,19 +47,19 @@
       <div slot="footer"></div>
     </nav>
     <Modal
-      v-model="addClassModal"
-      title="添加class">
-      <Form ref="addClassForm" :model="addClassForm" :rules="addClassRules" :label-width="90">
+      v-model="addCourseModal"
+      title="添加课程">
+      <Form ref="addCourseForm" :model="addCourseForm" :rules="addCourseRules" :label-width="90">
         <FormItem label="班名" prop="name">
-          <Input v-model="addClassForm.name"></Input>
+          <Input v-model="addCourseForm.name"></Input>
         </FormItem>
         <FormItem label="任课老师姓名" prop="teacherName">
-          <Input v-model="addClassForm.teacherName"></Input>
+          <Input v-model="addCourseForm.teacherName"></Input>
         </FormItem>
       </Form>
       <div slot="footer">
-        <Button @click="addClassModal = false">返回</Button>
-        <Button type="primary" :loading="addingClass" @click="addClass">确定</Button>
+        <Button @click="addCourseModal = false">返回</Button>
+        <Button type="primary" :loading="addingCourse" @click="addCourse">确定</Button>
       </div>
     </Modal>
   </div>
@@ -70,7 +70,7 @@ import SidebarNavDropdown from './SidebarNavDropdown'
 import SidebarNavLink from './SidebarNavLink'
 import SidebarNavTitle from './SidebarNavTitle'
 import { mapGetters } from 'vuex'
-import { AddClass, GetClassList } from '@/api/class'
+import { AddCourse, GetCourseList } from '@/api/course'
 export default {
   name: 'sidebar',
   props: {
@@ -103,14 +103,14 @@ export default {
     };
 
     return {
-      addClassModal: false,
-      addingClass: false,
-      classList: [],
-      addClassForm: {
+      addCourseModal: false,
+      addingCourse: false,
+      courseList: [],
+      addCourseForm: {
         name: '',
         teacherName: ''
       },
-      addClassRules: {
+      addCourseRules: {
         name: [
           { require: true, validator: validateName }
         ],
@@ -122,21 +122,21 @@ export default {
   },
   computed: {
     ...mapGetters(['role']),
-    classListNav() {
-      return this.classList.map(data => {
+    courseListNav() {
+      return this.courseList.map(data => {
         return {
           name: data.name,
-          url: '/classInfo/' + data.id,
+          url: '/courseInfo/' + data.id,
           icon: 'icon-star'
         }
       });
     }
   },
   mounted() {
-    GetClassList().then(res => {
+    GetCourseList().then(res => {
       if (res.data.code === 0) {
-        this.classList = res.data.classList;
-        console.log('this.classList', this.classList);
+        this.courseList = res.data.courseList;
+        console.log('this.courseList', this.courseList);
       }
     }).catch(err => {
       console.error(err);
@@ -148,17 +148,17 @@ export default {
       e.target.parentElement.classList.toggle('open')
     },
 
-    addClass() {
-      this.$refs.addClassForm.validate(valid => {
+    addCourse() {
+      this.$refs.addCourseForm.validate(valid => {
         if (valid) {
-          this.addingClass = true;
-          AddClass(this.addClassForm).then(res => {
+          this.addingCourse = true;
+          AddCourse(this.addCourseForm).then(res => {
             if (res.data.code === 0) {
-              console.log('res.data.classData', res.data.classData);
-              this.classList.push(res.data.classData);
-              this.addingClass = false;
-              this.addClassModal = false;
-              this.$Message.success('创建class成功');
+              console.log('res.data.courseData', res.data.courseData);
+              this.courseList.push(res.data.courseData);
+              this.addingCourse = false;
+              this.addCourseModal = false;
+              this.$Message.success('创建课程成功');
             }
           }).catch(err => {
             console.error(err);
@@ -177,7 +177,7 @@ export default {
     cursor:pointer;
   }
 
-  .add-class-button {
+  .add-course-button {
     cursor: pointer;
     padding: 4px 7px;
   }

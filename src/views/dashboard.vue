@@ -8,19 +8,19 @@
 
 <script>
   import { mapGetters } from 'vuex'
-  import { GetClassList } from '@/api/class'
+  import { GetCourseList } from '@/api/course'
   export default {
     name: 'Dashboard',
     computed: {
       ...mapGetters(['fullname', 'role'])
     },
     mounted() {
-      GetClassList().then(res => {
+      GetCourseList().then(res => {
         if (res.data.code === 0) {
-          const classList = res.data.classList;
-          if (classList.length) {
-            let path = '/classInfo/';
-            path += classList[0].id;
+          const courseList = res.data.courseList;
+          if (courseList.length) {
+            let path = '/courseInfo/';
+            path += courseList[0].id;
             this.$router.push({ path: path });
           }
         }

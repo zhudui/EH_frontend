@@ -5,7 +5,7 @@ const userMap = [
     fullname: '朱子豪',
     email: '120@qq.com',
     role: 'student',
-    classIdArr: ['a'],
+    courseIdArr: ['a'],
     sid: '14331398',
     token: '1'
   }

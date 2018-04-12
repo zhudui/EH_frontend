@@ -7,7 +7,7 @@ import Full from '@/containers/Full'
 // Views
 import adminDashboard from '@/views/admin/dashboard'
 import teacherDashboard from '@/views/dashboard'
-import classInfo from '@/views/classInfo'
+import courseInfo from '@/views/courseInfo'
 import review from '@/views/teacher/review'
 import totalMark from '@/views/teacher/totalMark'
 
@@ -47,10 +47,10 @@ export const asyncRouterMap = [
         component: teacherDashboard
       },
       {
-        path: 'classInfo/:classId',
-        name: 'ClassInfo',
+        path: 'courseInfo/:courseId',
+        name: 'CourseInfo',
         meta: { roles: ['teacher', 'ta', 'student'] },
-        component: classInfo
+        component: courseInfo
       },
       {
         path: 'review/:homeworkId',
@@ -59,7 +59,7 @@ export const asyncRouterMap = [
         component: review
       },
       {
-        path: 'totalMark/:classId',
+        path: 'totalMark/:courseId',
         name: 'TotalMark',
         meta: { roles: ['teacher', 'ta'] },
         component: totalMark

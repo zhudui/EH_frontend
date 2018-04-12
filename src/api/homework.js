@@ -8,16 +8,16 @@ export function AddHomework(homework) {
   });
 }
 
-export function GetHomeworkList(classId) {
+export function GetHomeworkList(courseId) {
   return fetch({
-    url: '/homeworkList?classId=' + classId,
+    url: '/homeworkList?courseId=' + courseId,
     method: 'get'
   });
 }
 
-export function GetHomeworkNameList(classId) {
+export function GetHomeworkNameList(courseId) {
   return fetch({
-    url: '/homeworkNameList?classId=' + classId,
+    url: '/homeworkNameList?courseId=' + courseId,
     method: 'get'
   });
 }
