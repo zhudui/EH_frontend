@@ -47,6 +47,8 @@ const user = {
           if (response.data.code === 0) {
             const user = response.data.user;
             commit('SET_ID', user.id);
+            console.log('Cookies.get(\'token\')', Cookies.get('token'))
+            console.log('document.cookie', document.cookie);
             commit('SET_TOKEN', Cookies.get('token'));
             commit('SET_USERNAME', username);
             commit('SET_FULLNAME', user.fullname);

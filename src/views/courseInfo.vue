@@ -1,10 +1,10 @@
 <template>
   <div class="course-info-container clearfix">
-    <h5 class="left" style="margin-top: 4px;">{{courseName}}</h5>
-    <div class="operation-bar clearfix" v-if="role === 'teacher' || role === 'ta'">
-      <Button class="right" type="warning" @click="jumpToTotalMark">查看班级总评</Button>
-      <Button class="right" type="success" style="margin-right: 15px" @click="toggleCourseUserList">管理班级用户</Button>
-      <Button class="right" type="primary" style="margin-right: 15px" @click="addHomeworkModal = true">添加作业</Button>
+    <div class="operation-bar clearfix">
+      <h5 class="left" style="margin-top: 5px;">{{courseName}}</h5>
+      <Button class="right" type="warning" @click="jumpToTotalMark"  v-if="role === 'teacher' || role === 'ta'">查看课程总评</Button>
+      <Button class="right" type="success" style="margin-right: 15px" @click="toggleCourseUserList"  v-if="role === 'teacher' || role === 'ta'">管理课程用户</Button>
+      <Button class="right" type="primary" style="margin-right: 15px" @click="showAddHomeworkModal"  v-if="role === 'teacher' || role === 'ta'">添加作业</Button>
     </div>
     <div :class="{ 'form-container': true, 'hide-form': hideForm }" v-if="role === 'teacher' || role === 'ta'">
       <Form ref="addCourseUserForm" :model="addCourseUserForm" :rules="addCourseUserRules" :label-width="80" style="margin-top: 24px">
@@ -49,6 +49,9 @@
             </a>
             <DropdownMenu slot="list">
               <DropdownItem>
+                <div class="homework-dropdown-item" @click="downloadHomework(homeworkList[4*n-5+m])"><Icon type="clipboard" :size="20"></Icon> <span>下载作业</span></div>
+              </DropdownItem>
+              <DropdownItem>
                 <div class="homework-dropdown-item" @click="showDescription(homeworkList[4*n-5+m])"><Icon type="clipboard" :size="20"></Icon> <span>作业描述</span></div>
               </DropdownItem>
               <DropdownItem v-if="(role === 'teacher' || role === 'ta') && homeworkList[4*n-5+m].state !== 'future'">
@@ -64,7 +67,8 @@
           </Dropdown>
           <div class="h4 m-0">{{homeworkList[4*n-5+m].name}}</div>
           <div class="homework-daterange">{{homeworkList[4*n-5+m].startTime}} ~ {{homeworkList[4*n-5+m].endTime}}</div>
-          <b-progress class="progress-white progress-xs my-3" :value="25"/>
+          <Progress :percent="homeworkList[4*n-5+m].submitNum / homeworkList[4*n-5+m].studentNum * 100" status="active" :hide-info="true" :stroke-width="8" style="margin-bottom: 5px;"></Progress>
+          <small class="text-muted left" style="margin-right: 15px;">{{homeworkList[4*n-5+m].submitNum}} / {{homeworkList[4*n-5+m].studentNum}}</small>
           <small class="text-muted download-homework left" v-if="homeworkList[4*n-5+m].state !== 'future' && role === 'student'" @click="downloadUserHomework(homeworkList[4*n-5+m].id)">下载我的作业</small>
           <small class="text-muted right" v-if="homeworkList[4*n-5+m].state === 'future'">未开放</small>
           <small class="text-muted right" v-else-if="homeworkList[4*n-5+m].state === 'open'">开放中</small>
@@ -77,7 +81,7 @@
       v-model="addHomeworkModal"
       title="添加作业"
       :mask-closable="false">
-      <Form ref="addHomeworkForm" :model="addHomeworkForm" :rules="addHomeworkRules" :label-width="90">
+      <Form ref="addHomeworkForm" :model="addHomeworkForm" :rules="addHomeworkRules">
         <FormItem label="作业名" prop="name">
           <Input v-model="addHomeworkForm.name"></Input>
         </FormItem>
@@ -87,7 +91,21 @@
         <FormItem label="结束时间" prop="endTime">
           <DatePicker type="datetime" v-model="addHomeworkForm.endTime" placeholder="请选择结束时间..." style="width: 300px"></DatePicker>
         </FormItem>
-        <FormItem label="作业描述" prop="description">
+        <p>提示：只有最新上传的作业才有效，新上传的作业会覆盖之前上传的作业</p>
+        <Upload
+          ref="uploadHomework"
+          type="drag"
+          :default-file-list="fileList"
+          :data="uploadData"
+          :before-upload="handleUpload"
+          action="/api/upload">
+          <div style="padding: 20px 0">
+            <Icon type="ios-cloud-upload" size="52" style="color: #3399ff"></Icon>
+            <p>Click or drag files here to upload</p>
+          </div>
+        </Upload>
+        <div v-if="homeworkFile !== null">上传作业: {{ homeworkFile.name }}</div>
+        <FormItem label="作业描述" prop="description" placeholder="可不填">
           <Input type="textarea" :rows="15" v-model="addHomeworkForm.description"></Input>
         </FormItem>
       </Form>
@@ -130,6 +148,7 @@
         type="drag"
         :default-file-list="fileList"
         :data="uploadData"
+        :on-success="handleSuccessSubmit"
         action="/api/upload">
         <div style="padding: 20px 0">
           <Icon type="ios-cloud-upload" size="52" style="color: #3399ff"></Icon>
@@ -188,8 +207,8 @@
       };
 
       const validateDescription = (rule, value, callback) => {
-        if (value.length === 0 || value.length > 2000) {
-          callback(new Error('作业描述应包含1~2000个字符'));
+        if (value.length > 2000) {
+          callback(new Error('作业描述应少于2000个字符'));
         } else {
           callback();
         }
@@ -197,6 +216,7 @@
 
       return {
         courseName: '',
+        courseStudentNum: 0,
         addHomeworkModal: false,
         addingHomework: false,
         addHomeworkForm: {
@@ -216,7 +236,7 @@
             { require: true, validator: validateEndTime }
           ],
           description: [
-            { require: true, validator: validateDescription }
+            { require: false, validator: validateDescription }
           ]
         },
         homeworkList: [],
@@ -272,7 +292,7 @@
                   on: {
                     click: () => {
                       this.deleteCourseUserInfo.userId = params.row.id;
-                      this.deleteCrouseUserInfo.username = params.row.username;
+                      this.deleteCourseUserInfo.username = params.row.username;
                       this.deleteCourseUserModal = true;
                     }
                   }
@@ -294,7 +314,8 @@
           reviewerRole: '',
           comment: '',
           score: null
-        }
+        },
+        homeworkFile: null
       }
     },
     computed: {
@@ -312,17 +333,7 @@
           console.error(err);
         });
         this.$store.dispatch('getCourseName', { courseId: this.$route.params.courseId });
-        GetHomeworkList(this.$route.params.courseId).then(res => {
-          if (res.data.code === 0) {
-            this.homeworkList = res.data.homeworkList;
-            addHomeworkState(this.homeworkList);
-            this.homeworkRow = Math.ceil(this.homeworkList.length / 4);
-            if (this.homeworkRow === 0) this.homeworkRow = 1;
-            console.log('this.homeworkList', this.homeworkList);
-          }
-        }).catch(err => {
-          console.error(err);
-        });
+        this.getHomeworkList();
       }
     },
     mounted() {
@@ -334,17 +345,7 @@
       }).catch(err => {
         console.error(err);
       });
-      GetHomeworkList(this.$route.params.courseId).then(res => {
-        if (res.data.code === 0) {
-          this.homeworkList = res.data.homeworkList;
-          addHomeworkState(this.homeworkList);
-          this.homeworkRow = Math.ceil(this.homeworkList.length / 4);
-          if (this.homeworkRow === 0) this.homeworkRow = 1;
-          console.log('this.homeworkList', this.homeworkList);
-        }
-      }).catch(err => {
-        console.error(err);
-      });
+      this.getHomeworkList();
 
       // 每过十秒更新一次作业的状态
       this.interval = setInterval(() => {
@@ -378,6 +379,11 @@
             console.log(err);
           });
         }
+      },
+
+      showAddHomeworkModal() {
+        this.fileList = [];
+        this.addHomeworkModal = true;
       },
 
       addCourseUser() {
@@ -444,19 +450,23 @@
               this.$Message.warning('结束时间应该大于开始时间');
               this.addingHomework = false;
             } else {
-              AddHomework(homeworkData).then(res => {
-                if (res.data.code === 0) {
-                  this.addingHomework = false;
-                  this.addHomeworkModal = false;
-                  addHomeworkState(res.data.homework);
-                  console.log('res.data.homework', res.data.homework);
-                  this.homeworkList.push(res.data.homework);
-                  this.homeworkRow = Math.ceil(this.homeworkList.length / 4);
-                  this.$Message.success('创建作业成功');
-                }
-              }).catch(err => {
-                console.error(err);
-              })
+              if (!this.homeworkFile && !this.addHomeworkForm.description) {
+                this.$Message.warning('请至少上传作业文件或填写作业描述，不能两项都为空');
+                this.addingHomework = false;
+              } else {
+                AddHomework(homeworkData).then(res => {
+                  if (res.data.code === 0) {
+                    this.addingHomework = false;
+                    this.addHomeworkModal = false;
+                    this.uploadData.homeworkId = res.data.homework.id;
+                    this.$refs.uploadHomework.post(this.homeworkFile);
+                    this.getHomeworkList();
+                    this.$Message.success('创建作业成功');
+                  }
+                }).catch(err => {
+                  console.error(err);
+                })
+              }
             }
           } else {
             this.$Message.error('输入不正确，请检查');
@@ -488,8 +498,9 @@
       },
 
       showSubmitModal(homework) {
-        this.submitHomeworkModal = true;
+        this.fileList = [];
         this.uploadData.homeworkId = homework.id;
+        this.submitHomeworkModal = true;
       },
 
       downloadUserHomework(homeworkId) {
@@ -515,6 +526,54 @@
 
       jumpToTotalMark() {
         this.$router.push({ path: '/totalMark/' + this.$route.params.courseId });
+      },
+
+      handleUpload(file) {
+        this.homeworkFile = file;
+        return false;
+      },
+
+      downloadHomework(homework) {
+        GetFilePath({
+          homeworkId: homework.id,
+          isTfile: true // 表示获取老师或TA上传的作业
+        }).then(res => {
+          if (res.data.code === 0) {
+            console.log('res.data.filePath', res.data.filePath)
+            const filename = homework.name;
+            fileDownload(res.data.filePath, filename);
+          } else {
+            this.$Message.warning(res.data.msg);
+          }
+        }).catch(err => {
+          console.error(err);
+        })
+      },
+
+      getHomeworkList() {
+        GetHomeworkList(this.$route.params.courseId).then(res => {
+          if (res.data.code === 0) {
+            let homeworkList = res.data.homeworkList;
+            let uploadDataList = res.data.uploadDataList;
+            addHomeworkState(homeworkList);
+            console.log('homeworkList', homeworkList);
+            console.log('uploadDataList', uploadDataList);
+            for (let i = 0; i < homeworkList.length; ++i) {
+              homeworkList[i].studentNum = uploadDataList[i].studentNum;
+              homeworkList[i].submitNum = uploadDataList[i].submitNum;
+            }
+            this.homeworkList = homeworkList;
+            this.homeworkRow = Math.ceil(this.homeworkList.length / 4);
+            if (this.homeworkRow === 0) this.homeworkRow = 1;
+            console.log('this.homeworkList', this.homeworkList);
+          }
+        }).catch(err => {
+          console.error(err);
+        });
+      },
+
+      handleSuccessSubmit() {
+        this.getHomeworkList();
       }
     }
   }

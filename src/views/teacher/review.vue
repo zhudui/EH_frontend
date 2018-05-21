@@ -1,5 +1,6 @@
 <template>
   <div class="review-container">
+    <h5 style="margin-bottom: 15px;">{{homeworkName}} 课程成绩总评</h5>
     <Table :columns="userColumns" :data="studentList"></Table>
   </div>
 </template>
@@ -8,11 +9,13 @@
   import { mapGetters } from 'vuex'
   import { GetUploadUserList } from '@/api/user'
   import { GetReviewList, SubmitReview } from '@/api/review'
+  import { GetHomeworkName } from '@/api/homework'
   import { fileDownload } from '@/utils'
   export default {
     name: 'Review',
     data() {
       return {
+        homeworkName: '',
         studentList: [],
         uploads: [],
         userColumns: [
@@ -123,6 +126,14 @@
       ...mapGetters(['userId', 'username', 'fullname', 'role'])
     },
     mounted() {
+      GetHomeworkName(this.$route.params.homeworkId).then(res => {
+        if (res.data.code === 0) {
+          console.log('courseData', res.data);
+          this.homeworkName = res.data.homeworkData.name;
+        }
+      }).catch(err => {
+        console.error(err);
+      });
       const reqData = {
         homeworkId: this.$route.params.homeworkId
       };

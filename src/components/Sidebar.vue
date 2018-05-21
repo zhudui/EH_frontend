@@ -3,12 +3,15 @@
     <nav class="sidebar-nav">
       <div slot="header"></div>
       <ul class="nav">
-        <li class="nav-item" v-if="role !== 'admin'">
-          <li class="nav-title">
+        <li class="nav-item">
+          <li class="nav-title" v-if="role !== 'admin'">
             class列表
             <span @click="addCourseModal = true" v-if="role === 'teacher'">
               <b-badge variant="primary" class="add-course-button right">添加课程</b-badge>
             </span>
+          </li>
+          <li class="nav-title" v-else>
+            你好，管理员
           </li>
         </li>
         <li class="nav-item" v-for="(item, index) in courseListNav">
@@ -73,13 +76,6 @@ import { mapGetters } from 'vuex'
 import { AddCourse, GetCourseList } from '@/api/course'
 export default {
   name: 'sidebar',
-  props: {
-    navItems: {
-      type: Array,
-      required: true,
-      default: () => []
-    }
-  },
   components: {
     SidebarNavDropdown,
     SidebarNavLink,

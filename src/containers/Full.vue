@@ -2,7 +2,7 @@
   <div class="app">
     <AppHeader/>
     <div class="app-body">
-      <Sidebar :navItems="nav"/>
+      <Sidebar/>
       <main class="main">
         <div class="container-fluid">
           <router-view></router-view>
@@ -14,7 +14,6 @@
 </template>
 
 <script>
-import nav from '../_nav'
 import { Header as AppHeader, Sidebar, Aside as AppAside } from '../components/'
 
 export default {
@@ -23,16 +22,6 @@ export default {
     AppHeader,
     Sidebar,
     AppAside
-  },
-  data () {
-    return {
-      nav: nav.items
-    }
-  },
-  computed: {
-    name () {
-      return this.$route.name
-    }
   }
 }
 </script>
@@ -40,5 +29,9 @@ export default {
 <style scoped>
   .container-fluid {
     padding-top: 20px;
+  }
+
+  .main {
+    background-color: #e4e5e6;
   }
 </style>

@@ -21,3 +21,10 @@ export function GetHomeworkNameList(courseId) {
     method: 'get'
   });
 }
+
+export function GetHomeworkName(homeworkId) {
+  return fetch({
+    url: '/homeworkName?homeworkId=' + homeworkId,
+    method: 'get'
+  });
+}

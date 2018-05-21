@@ -1,6 +1,6 @@
 <template>
   <div class="total-mark-container">
-    <h5 style="margin-bottom: 15px;">{{courseName}} 班级成绩总评</h5>
+    <h5 style="margin-bottom: 15px;">{{courseName}} 课程成绩总评</h5>
     <Table border :columns="userColumns" :data="studentList"></Table>
   </div>
 </template>

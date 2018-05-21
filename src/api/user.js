@@ -55,7 +55,7 @@ export function DeleteUser(user) {
     url: '/user',
     method: 'delete',
     data: user
-  })
+  });
 }
 
 export function GetCourseUserList(courseId, option) {
@@ -74,7 +74,7 @@ export function AddCourseUser(data) {
     url: '/addCourseUser',
     method: 'post',
     data: data
-  })
+  });
 }
 
 export function DeleteCourseUser(data) {
@@ -82,7 +82,7 @@ export function DeleteCourseUser(data) {
     url: '/userCourse',
     method: 'delete',
     data: data
-  })
+  });
 }
 
 export function GetUploadUserList(data) {
@@ -90,5 +90,13 @@ export function GetUploadUserList(data) {
     url: '/getUploadUserList',
     method: 'post',
     data: data
-  })
+  });
+}
+
+export function ChangePassword(data) {
+  return fetch({
+    url: '/changePassword',
+    method: 'post',
+    data: data
+  });
 }
