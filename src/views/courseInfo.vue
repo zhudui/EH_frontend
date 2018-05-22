@@ -21,7 +21,7 @@
       <div class="right">
         <Button type="success" style="margin: 13px 0;" @click="hideForm = !hideForm">添加新用户</Button>
       </div>
-      <Table :row-class-name="rowClassName" :columns="courseUserColumns" :data="courseUserList" style="margin-top: 60px"></Table>
+      <Table height="426" :row-class-name="rowClassName" :columns="courseUserColumns" :data="courseUserList" style="margin-top: 60px"></Table>
     </div>
     <Modal v-model="deleteCourseUserModal" width="360" v-if="role === 'teacher' || role === 'ta'">
       <p slot="header" style="color:#f60;text-align:center">
